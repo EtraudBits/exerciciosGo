@@ -4,8 +4,8 @@
 ![Status](https://img.shields.io/badge/Status-Em%20Aprendizado-yellow?style=for-the-badge)
 ![Backend](https://img.shields.io/badge/Desenvolvedor-Backend-blue?style=for-the-badge)
 
-Bem-vindo ao meu repositório de estudos da linguagem **Go (Golang)**!  
-Este espaço é dedicado ao meu **desenvolvimento contínuo como programador backend**, explorando desde os conceitos fundamentais até práticas avançadas da linguagem.
+Bem-vindo ao repositório **ExerciciosGO**!  
+Este espaço é dedicado a **pratica de estudos com exercicios em Go**, com foco em **logica de programacao**.
 
 ---
 
@@ -24,42 +24,14 @@ O propósito deste repositório é documentar minha **jornada de aprendizado em 
 
 ## 📚 Estrutura do Repositório
 
-```bash
-📦 exerciciosGo/
- ┣ 📂 convtermometricas/   # Conversao de temperaturas
- ┣ 📂 exercicio1/
- ┣ 📂 exercicio2/
- ┣ 📂 exercicio3/
- ┣ 📂 exercicio4/
- ┣ 📂 exercicio5/
- ┣ 📂 exercicio6/
- ┣ 📂 exercicio7/
- ┣ 📂 exercicio8/
- ┣ 📂 exercicio9/
- ┣ 📂 exercicio10/
- ┣ 📂 exercicio11/
- ┣ 📂 exercicio12/
- ┣ 📂 exercicio13/
- ┣ 📂 exercicio14/
- ┣ 📂 exercicio15/
- ┣ 📂 exercicio16/
- ┣ 📂 exercicio17/
- ┣ 📂 exercicio18/
- ┣ 📂 exercicio19/
- ┣ 📂 exercicio20/
- ┣ 📂 exercicio21/
- ┗ 📄 README.md
-
-```
+Os exercicios ficam organizados em pastas, cada uma com seu proprio `main.go` e um README local explicando o objetivo.
 
 ## ▶️ Como Executar
 
-Cada exercicio possui seu proprio `main.go` dentro da pasta correspondente. Execute assim:
+Entre na pasta do exercicio desejado e rode:
 
 ```bash
-go run ./convtermometricas
-go run ./exercicio1
-go run ./exercicio2
+go run .
 ```
 
 ---
@@ -103,4 +75,4 @@ Sinta-se à vontade para abrir uma _issue_ ou enviar um _pull request_ com melho
 🎯 Focado em construir soluções limpas, performáticas e bem estruturadas com **Go**.
 
 📫 **Conecte-se comigo no LinkedIn:**  
-[www.linkedin.com/in/duarte84oliveira](https://www.linkedin.com/in/duarte84oliveira)
+[www.linkedin.com/in/duarte-backend-golang](https://www.linkedin.com/in/duarte-backend-golang)
