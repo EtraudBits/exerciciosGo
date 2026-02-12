@@ -14,7 +14,7 @@ func main () {
 
 	quantidadeCarne := float64(pessoa) * mediaPorPessoa
 
-	fmt.Printf("a quantidade de carne para o churrasco é: %.2f kg", quantidadeCarne)
+	fmt.Printf("a quantidade de carne para %d pessoas no churrasco é: %.2f kg\n", pessoa, quantidadeCarne)
 
 
 }
