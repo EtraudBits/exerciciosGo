@@ -24,9 +24,9 @@ func main() { // funcao principal do programa
 	quantidadeCarneGramas := pessoa * mediaPorPessoaGramas // calcula a quantidade total em gramas
 	custoTotalCentavos := quantidadeCarneGramas * precoCarneCentavos / 1000 // calcula o custo total em centavos
 	quantidadeCarneKg := float64(quantidadeCarneGramas) / 1000.0 // converte gramas para kg
-	
+
 	fmt.Printf("a quantidade de carne para %d pessoas no churrasco é: %.2f kg\n", pessoa, quantidadeCarneKg) // imprime a quantidade de carne
-	fmt.Printf("O custo total da carne para %d pessoas no churrasco é: R$ %d.%02d\n", pessoa, custoTotalCentavos/100, custoTotalCentavos%100) // imprime o custo total
+	fmt.Printf("O custo total da carne para %d pessoas no churrasco é: R$ %d.%02d\n", pessoa, custoTotalCentavos/100, custoTotalCentavos%100) // imprime o custo total (%d.%02d - onde %d antes do ponto é a parte inteira e %02d depois do ponto é a parte decimal com 2 digitos)
 } // encerra a funcao main
 
 
