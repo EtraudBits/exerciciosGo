@@ -1,43 +1,68 @@
-package main // Define o pacote principal do programa.
+package main
 
-import ( // Inicia o bloco de imports.
-	"bufio"   // Leitura com buffer do teclado.
-	"fmt"     // Funcoes de entrada/saida formatadas.
-	"os"      // Acesso a recursos do sistema operacional.
-	"strconv" // Conversao de string para numero.
-	"strings" // Funcoes auxiliares para string.
-) // Finaliza o bloco de imports.
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+	"unicode"
+)
 
-func main() { // Ponto de entrada do programa.
-
-	reader := bufio.NewReader(os.Stdin) // Cria um leitor para a entrada padrão.
-
-	//var nomeCao string // Exemplo antigo de declaracao (comentado).
-	//var idade int // Exemplo antigo de declaracao (comentado).
-
-	fmt.Print("Qual o nome do cao?") // Mostra o prompt do nome.
-	//fmt.Scan(&nomeCao) // Leitura simples (comentada).
-	nomeCao, err := reader.ReadString('\n') // Le o nome ate a quebra de linha.
-	nomeCao = strings.TrimSpace(nomeCao) // Remove espacos e o \n do fim.
-	
-	idadeHumana := 0 // Declara fora do loop para usar no calculo final.
-	for { // Loop para garantir uma idade valida.
-		fmt.Print("Qual a idade dele (Anos Humano)?") // Mostra o prompt da idade.
-		//fmt.Scan(&idade) // Leitura simples (comentada).
-		idadeTexto, _ := reader.ReadString('\n') // Le a idade como texto.
-		idadeTexto = strings.TrimSpace(idadeTexto) // Remove espacos e o \n do fim.
-
-		idadeHumana, err = strconv.Atoi(idadeTexto) // Converte idade para inteiro.
-		if err != nil { // Verifica se houve erro na conversao.
-			fmt.Println("Idade inválida. Por favor insira um número inteiro!") // Mensagem de erro.
-			continue // Volta para o início do loop para tentar novamente.
+func isNomeValido(nome string) bool {
+	if nome == "" {
+		return false
+	}
+	for _, r := range nome {
+		if !unicode.IsLetter(r) && !unicode.IsSpace(r) {
+			return false
 		}
-		break // Sai do loop se a conversao foi bem-sucedida.
+	}
+	return true
+}
+
+func main() {
+
+	reader := bufio.NewReader(os.Stdin)
+
+	//var nomeCao string
+	//var idade int
+	var err error
+
+	var nomeCao string
+	var entrada string
+	for {
+		fmt.Print("Qual o nome do cao?")
+		//fmt.Scan(&nomeCao)
+		entrada, err = reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("Erro ao ler o nome. Tente novamente!")
+			continue
+		}
+		nomeCao = strings.TrimSpace(entrada)
+		if !isNomeValido(nomeCao) {
+			fmt.Println("Nome invalido. Use apenas letras e espacos.")
+			continue
+		}
+		break
+	}
+	
+	idadeHumana := 0
+	for {
+		fmt.Print("Qual a idade dele (Anos Humano)?")
+		//fmt.Scan(&idade)
+		idadeTexto, _ := reader.ReadString('\n')
+		idadeTexto = strings.TrimSpace(idadeTexto)
+
+		idadeHumana, err = strconv.Atoi(idadeTexto)
+		if err != nil {
+			fmt.Println("Idade inválida. Por favor insira um número inteiro!")
+			continue
+		}
+		break
 	}
 
-	anosCao := idadeHumana * 7 // Calcula idade do cao em anos caninos.
+	anosCao := idadeHumana * 7
 
-	
-
-	fmt.Printf("A idade do cao %s, é de %d anos de cao\n", nomeCao, anosCao) // Exibe o resultado.
+	fmt.Printf("A idade do cao %s, é de %d anos de cao\n", nomeCao, anosCao)
 }
