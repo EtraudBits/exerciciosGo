@@ -80,4 +80,7 @@ func main() { // Ponto de entrada do programa.
 	anosCao := calculaAnosCao(idadeHumana) // Calcula a idade do cao em anos caninos.
 
 	fmt.Printf("A idade do cao %s, é de %.2f anos de cao\n", nomeCao, anosCao) // Exibe o resultado.
-}
+	fmt.Println("até 1 ano: idade × 15 anos de cao")
+	fmt.Println("de 1 a 2 anos: 15 + (idade - 1) × 9 anos de cao")
+	fmt.Println("acima de 2 anos: 24 + (idade - 2) × 5 anos de cao")
+} // Finaliza a funcao main.
