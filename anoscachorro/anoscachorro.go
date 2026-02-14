@@ -47,7 +47,7 @@ func main() { // Ponto de entrada do programa.
 	var entrada string // Declara a variavel para entrada de texto.
 	
 	for { // Loop para garantir um nome valido.
-		fmt.Print("Qual o nome do cao?") // Exibe o prompt do nome.
+		fmt.Print("Qual o nome do cao? ") // Exibe o prompt do nome.
 		//fmt.Scan(&nomeCao) // Leitura simples (comentada).
 		entrada, err = reader.ReadString('\n') // Le ate a quebra de linha.
 		if err != nil { // Verifica erro de leitura.
@@ -64,7 +64,7 @@ func main() { // Ponto de entrada do programa.
 	
 	idadeHumana := 0.0 // Inicializa a idade humana como decimal.
 	for { // Loop para garantir uma idade valida.
-		fmt.Print("Qual a idade dele (Anos Humano)?") // Exibe o prompt da idade.
+		fmt.Print("Qual a idade dele (Anos Humano)? ") // Exibe o prompt da idade.
 		//fmt.Scan(&idade) // Leitura simples (comentada).
 		idadeTexto, _ := reader.ReadString('\n') // Le a idade como texto.
 		idadeTexto = strings.TrimSpace(idadeTexto) // Remove espacos e o \n do fim.
@@ -80,6 +80,7 @@ func main() { // Ponto de entrada do programa.
 	anosCao := calculaAnosCao(idadeHumana) // Calcula a idade do cao em anos caninos.
 
 	fmt.Printf("A idade do cao %s, é de %.2f anos de cao\n", nomeCao, anosCao) // Exibe o resultado.
+	fmt.Println(">>> Regras para calcular a idade do cao:<<<") // Explica as regras usadas.
 	fmt.Println("até 1 ano: idade × 15 anos de cao")
 	fmt.Println("de 1 a 2 anos: 15 + (idade - 1) × 9 anos de cao")
 	fmt.Println("acima de 2 anos: 24 + (idade - 2) × 5 anos de cao")
