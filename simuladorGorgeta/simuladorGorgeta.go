@@ -8,19 +8,33 @@ import (
 	"strings" // usado na linha 21-37 para limpar a entrada de texto, removendo espacos e quebras de linha.
 )
 
-func calcularGorgeta(totalConta, porcentagemGorgeta float64) float64 { // Funcao que calcula o valor da gorgeta com base na conta e porcentagem.
-	gorgeta := totalConta * (porcentagemGorgeta / 100) // Calcula a gorgeta multiplicando a conta pela porcentagem convertida para decimal.
-	return gorgeta // Retorna o valor da gorgeta calculada.
+func calcularGorgeta(totalContaCentavos int, porcentagemGorgeta int) int { // Funcao que calcula o valor da gorgeta em centavos.
+	return totalContaCentavos * porcentagemGorgeta / 100
 }
 
-func formaPagamento(forma string, totalConta float64) float64 { // funcao que calcula o valor do desconto com base na conta.
+func formaPagamento(forma string, totalContaCentavos int) int { // funcao que calcula o valor do desconto em centavos.
 	if forma == "dinheiro" || forma == "pix" { // Verifica se a forma de pagamento e dinheiro ou Pix.
-		return totalConta * 0.10 // Aplica um desconto de 10% para pagamento em dinheiro ou Pix.
+		return totalContaCentavos * 10 / 100
 	} 
 	return 0 // Retorna 0 para outras formas de pagamento, sem desconto.
 	}
 
-
+func reaisParaCentavos(valor string) int { // converte string em reais para centavos
+	valor = strings.TrimSpace(valor) // remove espacos no inicio e fim
+	partes := strings.SplitN(valor, ".", 2) // separa parte inteira e decimal
+	reais, _ := strconv.Atoi(partes[0]) // converte a parte inteira em inteiro
+	centavos := 0 // inicia os centavos com zero
+	if len(partes) == 2 { // verifica se existe parte decimal
+		frac := partes[1] // guarda a parte decimal
+		if len(frac) == 1 { // se so houver um digito
+			frac += "0" // completa com zero
+		} else if len(frac) > 2 { // se tiver mais de dois digitos
+			frac = frac[:2] // usa apenas os dois primeiros
+		} // encerra o ajuste da parte decimal
+		centavos, _ = strconv.Atoi(frac) // converte a parte decimal em inteiro
+	} // encerra o bloco do decimal
+	return reais*100 + centavos // retorna o total em centavos
+} // encerra a funcao reaisParaCentavos
 
 func main() {
 
@@ -28,14 +42,14 @@ func main() {
 
 	var err error // Declara a variavel de erro no escopo do main.
 	
-	totalConta := 0.0 // Inicializa a conta como decimal.
+	totalContaCentavos := 0 // Inicializa a conta em centavos.
 	for { // Loop para garantir uma conta valida.
 		fmt.Print("Qual o valor da conta? ") // Exibe o prompt da conta.
 		totalContaTexto, _ := reader.ReadString('\n') // Le a conta como texto.
 		totalContaTexto = strings.TrimSpace(totalContaTexto) // Remove espacos e o \n do fim.
 
-		totalConta, err = strconv.ParseFloat(totalContaTexto, 64) // Converte texto para decimal.
-		if err != nil { // Verifica erro na conversao.
+		totalContaCentavos = reaisParaCentavos(totalContaTexto) // Converte texto para centavos.
+		if totalContaCentavos <= 0 { // Verifica erro na conversao.
 			fmt.Println("Valor da conta inválido. Por favor insira um número!") // Mensagem de erro.
 			continue // Volta para tentar novamente.
 		}
@@ -65,21 +79,21 @@ func main() {
 		break // Sai do loop quando a forma de pagamento e valida.
 	}
 
-	porcentagemGorgeta := 10.0 // Gorjeta padrao para outros.
+	porcentagemGorgeta := 10 // Gorjeta padrao para outros.
 	if metodoPagamento == "dinheiro" || metodoPagamento == "pix" {
-		porcentagemGorgeta = 15.0
+		porcentagemGorgeta = 15
 	}
 
-	gorgeta := calcularGorgeta(totalConta, porcentagemGorgeta)
-	desconto := formaPagamento(metodoPagamento, totalConta)
-	totalGeral := totalConta + gorgeta - desconto
+	gorgetaCentavos := calcularGorgeta(totalContaCentavos, porcentagemGorgeta)
+	descontoCentavos := formaPagamento(metodoPagamento, totalContaCentavos)
+	totalGeralCentavos := totalContaCentavos + gorgetaCentavos - descontoCentavos
 
 	fmt.Printf("\n")
-	fmt.Printf("Valor da gorgeta: R$ %.2f\n", gorgeta)
+	fmt.Printf("Valor da gorgeta: R$ %.2f\n", float64(gorgetaCentavos)/100)
 	fmt.Printf("\n")
-	fmt.Printf("Desconto aplicado: R$ %.2f\n", desconto)
+	fmt.Printf("Desconto aplicado: R$ %.2f\n", float64(descontoCentavos)/100)
 	fmt.Printf("\n")
-	fmt.Printf("Valor total a pagar (conta + gorgeta - desconto): R$ %.2f\n", totalGeral)
+	fmt.Printf("Valor total a pagar (conta + gorgeta - desconto): R$ %.2f\n", float64(totalGeralCentavos)/100)
 	fmt.Printf("\n")
 
 }
