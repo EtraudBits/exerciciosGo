@@ -21,10 +21,10 @@ Programa em Go que calcula a gorjeta e o total a pagar de uma conta, com base no
 
 - `bufio.NewReader(os.Stdin)` para leitura de entrada do usuario.
 - `strings.TrimSpace` para limpar a entrada.
-- `strconv.ParseFloat` para converter texto em `float64`.
+- `reaisParaCentavos` para converter texto em centavos (`int`) e evitar erros de ponto flutuante.
 - Funcoes auxiliares:
-  - `calcularGorgeta(totalConta, porcentagem)`
-  - `formaPagamento(forma, totalConta)`
+  - `calcularGorgeta(totalContaCentavos, porcentagem)`
+  - `formaPagamento(forma, totalContaCentavos)`
 
 ## Regras de negocio
 
@@ -38,9 +38,10 @@ Programa em Go que calcula a gorjeta e o total a pagar de uma conta, com base no
 
 1. Solicita o valor da conta.
 2. Solicita a forma de pagamento por opcao (1, 2 ou 3).
-3. Calcula a gorjeta conforme a forma de pagamento.
-4. Calcula o desconto (se aplicavel).
-5. Mostra os valores finais no terminal.
+3. Converte o valor da conta para centavos.
+4. Calcula a gorjeta conforme a forma de pagamento.
+5. Calcula o desconto (se aplicavel).
+6. Mostra os valores finais no terminal.
 
 ## Como executar
 
@@ -66,3 +67,4 @@ Saida esperada:
 ## Observacoes
 
 - O programa valida entradas basicas e repete a pergunta em caso de erro.
+- Os calculos sao feitos em centavos e convertidos para reais apenas na exibicao.
