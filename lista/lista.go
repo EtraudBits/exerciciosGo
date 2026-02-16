@@ -119,7 +119,7 @@ func main() {
 			quantidadeTexto, _ := reader.ReadString('\n') // Le a quantidade como texto.
 			quantidadeTexto = strings.TrimSpace(quantidadeTexto) // Remove espacos e o \n do fim.
 			quantidade, err := strconv.Atoi(quantidadeTexto) // Converte a quantidade para inteiro.
-			if err != nil || quantidade <= 0 { // Valida a quantidade.
+			if err != nil || quantidade <= 0 { // Valida a quantidade. se a conversao falhar ou a quantidade for menor ou igual a zero, exibe uma mensagem de erro e volta para o menu.
 				fmt.Println("Quantidade invalida. Use um numero inteiro maior que zero.")
 				continue
 			}
@@ -133,22 +133,43 @@ func main() {
 			quantidadeTexto, _ := reader.ReadString('\n') // Le a quantidade como texto.
 			quantidadeTexto = strings.TrimSpace(quantidadeTexto) // Remove espacos e o \n do fim.
 			quantidade, err := strconv.Atoi(quantidadeTexto) // Converte a quantidade para inteiro.
-			if err != nil || quantidade <= 0 { // Valida a quantidade.
+			if err != nil || quantidade <= 0 { // Valida a quantidade. se a conversao falhar ou a quantidade for menor ou igual a zero, exibe uma mensagem de erro e volta para o menu.
 				fmt.Println("Quantidade invalida. Use um numero inteiro maior que zero.")
+				continue // Volta para tentar novamente.
+			}
+			fmt.Printf("Tem certeza que deseja remover %d unidade(s) de '%s'? (s/n): ", quantidade, item) // Pede confirmacao.
+			confirmacao, _ := reader.ReadString('\n') // Le a confirmacao.
+			confirmacao = strings.ToLower(strings.TrimSpace(confirmacao)) // Normaliza a resposta.
+			if confirmacao != "s" && confirmacao != "sim" { // Verifica se o usuario cancelou.
+				fmt.Println("Operacao cancelada.") // Mensagem de cancelamento.
 				continue
 			}
 			if lista.RemoverItem(item, quantidade) { // Chama o metodo para remover o item da lista.
 				fmt.Printf("Quantidade %d removida do item '%s'!\n", quantidade, item) // Mensagem de confirmacao.
-				continue
+				continue // Volta para o menu apos remover o item.	
 			}
 			fmt.Printf("Nao foi possivel remover %d do item '%s'. Verifique se existe e a quantidade disponivel.\n", quantidade, item) // Mensagem de erro.
 		case "3": // Caso para exibir a lista.
 			lista.ExibirLista() // Chama o metodo para exibir os itens da lista.
 		case "4": // Caso para limpar a lista.
-			lista.LimparLista() // Chama o metodo para limpar a lista.
-			fmt.Println("Lista limpa!") // Mensagem de confirmacao.
+			fmt.Print("Tem certeza que deseja limpar toda a lista? (s/n): ") // Pede confirmacao.
+			confirmacao, _ := reader.ReadString('\n') // Le a confirmacao.
+			confirmacao = strings.ToLower(strings.TrimSpace(confirmacao)) // Normaliza a resposta.
+			if confirmacao == "s" || confirmacao == "sim" { // Verifica se o usuario confirmou.
+				lista.LimparLista() // Chama o metodo para limpar a lista.
+				fmt.Println("Lista limpa!") // Mensagem de confirmacao.
+			} else {
+				fmt.Println("Operacao cancelada.") // Mensagem de cancelamento.
+			}
 		case "5": // Caso para sair do programa.
-			lista.Sair() // Chama o metodo para sair do programa.
+			fmt.Print("Tem certeza que deseja sair? (s/n): ") // Pede confirmacao.
+			confirmacao, _ := reader.ReadString('\n') // Le a confirmacao.
+			confirmacao = strings.ToLower(strings.TrimSpace(confirmacao)) // Normaliza a resposta.
+			if confirmacao == "s" || confirmacao == "sim" { // Verifica se o usuario confirmou.
+				lista.Sair() // Chama o metodo para sair do programa.
+			} else {
+				fmt.Println("Operacao cancelada.") // Mensagem de cancelamento.
+			}
 		default: // Caso para opcao invalida.
 			fmt.Println("Opcao invalida. Por favor escolha uma opcao entre 1 e 5.") // Mensagem de erro.
 		}
