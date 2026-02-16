@@ -9,12 +9,13 @@ O objetivo e praticar structs, metodos, slices, leitura de entrada e validacao e
 - Criada a struct `Lista` com slice de itens e contador de itens.
 - Implementados metodos para:
   - Adicionar item com quantidade.
-  - Remover uma quantidade especifica do item.
+  - Remover uma quantidade especifica do item (com confirmacao).
   - Exibir a lista com as quantidades.
-  - Limpar a lista.
-  - Sair do programa.
+  - Limpar a lista (com confirmacao).
+  - Sair do programa (com confirmacao).
 - Tratamento de entrada do usuario (conversao para inteiro e validacao de quantidade).
 - Comparacao de nomes ignorando maiusculas/minusculas, acentos e sinais.
+- Confirmacoes de seguranca para operacoes criticas (remover, limpar e sair).
 
 ## Como funciona
 
@@ -40,6 +41,17 @@ foi criada uma funcao de normalizacao que:
 
 Assim, nomes digitados de formas diferentes ainda correspondem ao item cadastrado.
 
+## Confirmacoes de seguranca
+
+Para evitar operacoes acidentais, o programa solicita confirmacao antes de:
+
+- **Remover item**: Pergunta "Tem certeza que deseja remover X unidade(s) de 'item'? (s/n):"
+- **Limpar lista**: Pergunta "Tem certeza que deseja limpar toda a lista? (s/n):"
+- **Sair do programa**: Pergunta "Tem certeza que deseja sair? (s/n):"
+
+O usuario pode responder com "s", "sim" para confirmar, ou qualquer outra resposta para cancelar.
+As respostas sao normalizadas (convertidas para minusculas) para facilitar a interacao.
+
 ## Conceitos praticados
 
 - Structs e metodos com receiver.
@@ -48,6 +60,8 @@ Assim, nomes digitados de formas diferentes ainda correspondem ao item cadastrad
 - Conversao de string para inteiro com `strconv.Atoi`.
 - Validacao de dados.
 - Uso de `strings` e `unicode`.
+- Controle de fluxo com confirmacoes (if/else).
+- Normalizacao de entrada do usuario para comparacao.
 
 ## Como executar
 
@@ -58,5 +72,6 @@ go run lista.go
 ## Sugestoes de melhoria
 
 - Unificar itens iguais na adicao (somar quantidade se ja existir).
-- Exibir mensagem detalhada quando a remocao falhar.
 - Salvar e carregar a lista em arquivo.
+- Adicionar opcao para editar item existente.
+- Implementar busca de itens na lista.
