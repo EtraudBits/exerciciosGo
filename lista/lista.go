@@ -9,20 +9,20 @@ import (
 	"unicode"
 )
 
-type Item struct {
+type Item struct { // Struct para representar um item da lista, com nome e quantidade.
 	Nome string
 	Quantidade int
 }
 
-type Lista struct {
+type Lista struct { //Struct para representar a lista de itens.
 	Items []Item
 	Quantidade int
 }
 
-func normalizarItem(texto string) string {
-	texto = strings.ToLower(strings.TrimSpace(texto))
-	var b strings.Builder
-	for _, r := range texto {
+func normalizarItem(texto string) string { // Funcao para normalizar o nome do item, removendo acentos e caracteres especiais, e convertendo para minusculo.
+	texto = strings.ToLower(strings.TrimSpace(texto)) // Converte o texto para minusculo e remove espacos no inicio e fim.
+	var b strings.Builder // Cria um builder para construir a string normalizada de forma eficiente.
+	for _, r := range texto { // Loop para processar cada caractere do texto.
 		switch r {
 		case 'á', 'à', 'ã', 'â', 'ä':
 			r = 'a'
@@ -37,11 +37,11 @@ func normalizarItem(texto string) string {
 		case 'ç':
 			r = 'c'
 		}
-		if unicode.IsLetter(r) || unicode.IsDigit(r) {
-			b.WriteRune(r)
+		if unicode.IsLetter(r) || unicode.IsDigit(r) { // Verifica se o caractere e uma letra ou numero, ignorando caracteres especiais.
+			b.WriteRune(r) // Escreve o caractere normalizado no builder.
 		}
 	}
-	return b.String()
+	return b.String() // Retorna a string normalizada resultante do builder.
 }
 
 func (l *Lista) AdicionarItem(item string, quantidade int) { // Metodo para adicionar um item a lista.
