@@ -6,6 +6,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"unicode"
 )
 
 // Struct para representar um aluno, com nome e nota.
@@ -70,6 +71,21 @@ func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas 
 	}
 }
 
+func nomeValido(nome string) bool {
+	nome = strings.TrimSpace(nome)
+	if nome == "" {
+		return false
+	}
+
+	for _, r := range nome {
+		if !unicode.IsLetter(r) && !unicode.IsSpace(r) {
+			return false
+		}
+	}
+
+	return true
+}
+
 
 
 func main() {
@@ -100,6 +116,10 @@ func main() {
 			fmt.Print("Digite o nome do aluno: ") // Prompt para o nome do aluno.
 			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
 			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
+			if !nomeValido(nome) {
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
+				continue
+			}
 
 			fmt.Print("Digite a nota do aluno: ") // Prompt para a nota do aluno.
 			notaTexto, _ := reader.ReadString('\n') // Le a nota do aluno como texto.
@@ -107,7 +127,7 @@ func main() {
 
 			nota, err := strconv.ParseFloat(notaTexto, 64) // Converte a nota de texto para float64.
 			if err != nil { // Verifica erro na conversao da nota.
-				fmt.Println("Nota inválida. Por favor insira um número!") // Mensagem de erro.
+				fmt.Println("Nota inválida. A nota deve ser um número.") // Mensagem de erro.
 				continue // Volta para tentar novamente.
 			}
 
@@ -130,6 +150,10 @@ func main() {
 			fmt.Print("Digite o nome do aluno para atualizar a nota: ") // Prompt para o nome do aluno a ser atualizado.
 			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
 			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
+			if !nomeValido(nome) {
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
+				continue
+			}
 
 			fmt.Print("Digite a nova nota do aluno: ") // Prompt para a nova nota do aluno.
 			notaTexto, _ := reader.ReadString('\n') // Le a nova nota do aluno como texto.
@@ -137,7 +161,7 @@ func main() {
 
 			novaNota, err := strconv.ParseFloat(notaTexto, 64) // Converte a nova nota de texto para float64.
 			if err != nil { // Verifica erro na conversao da nova nota.
-				fmt.Println("Nota inválida. Por favor insira um número!") // Mensagem de erro.
+				fmt.Println("Nota inválida. A nota deve ser um número.") // Mensagem de erro.
 				continue // Volta para tentar novamente.
 			}
 
