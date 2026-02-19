@@ -62,8 +62,17 @@ Este programa de terminal permite cadastrar alunos, registrar notas, buscar info
 - `struct` para modelar `aluno` e `registroNotas`
 - métodos com receiver para regras de negócio
 - arrays fixos (`[4]float64`) para armazenar as 4 notas
+- **`map[string]int`** para otimizar busca por nome (O(1) em vez de O(n))
 - `for` e `switch` para fluxo do menu
 - funções auxiliares para validação e confirmação
+
+### Otimização com Map
+
+A estrutura `registroNotas` agora usa um mapa (`indices map[string]int`) que mapeia o nome do aluno para seu índice no slice. Isso permite:
+
+- Busca por nome em tempo constante O(1)
+- Atualização e remoção também otimizadas
+- O mapa é sincronizado com o slice em cada operação (adicionar, remover)
 
 ## Como executar
 
