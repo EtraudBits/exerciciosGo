@@ -12,47 +12,61 @@ import (
 // Struct para representar um aluno, com nome e nota.
 type aluno struct { 
 	nome string
-	nota float64
+	notas [4]float64
 }
 // Struct para representar o registro de notas, que contém um slice de alunos.
 type registroNotas struct {
 	alunos []aluno
 }
 
-func (r *registroNotas) adicionarAluno(nome string, nota float64) { // Metodo para adicionar um aluno ao registro de notas.
-	r.alunos = append(r.alunos, aluno{nome: nome, nota: nota}) // Adiciona um novo aluno ao slice de alunos do registro.
+func (r *registroNotas) adicionarAluno(nome string, notas [4]float64) { // Metodo para adicionar um aluno ao registro de notas.
+	r.alunos = append(r.alunos, aluno{nome: nome, notas: notas}) // Adiciona um novo aluno ao slice de alunos do registro.
 }
 
 func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar um aluno pelo nome no registro de notas.
-	alunos := map[string]aluno{} // Cria um mapa para armazenar os alunos por nome para busca eficiente.
-	for _, a := range r.alunos { // Loop para preencher o mapa com os alunos do registro.
-		alunos[a.nome] = a // Adiciona o aluno ao mapa usando o nome como chave.
-	}
-	if a, ok := alunos[nome]; ok { // Verifica se o aluno existe no mapa.
-		return &a // Retorna o ponteiro para o aluno encontrado.
+	for i, a := range r.alunos {
+		if a.nome == nome {
+			return &r.alunos[i]
+		}
 	}
 	return nil // Retorna nil se o aluno não for encontrado.
 }
 
-func (r *registroNotas) atualizarNotas(nome string, novaNota float64) bool { // Metodo para atualizar a nota de um aluno no registro de notas.
+func (r *registroNotas) atualizarNotas(nome string, novasNotas [4]float64) bool { // Metodo para atualizar as notas de um aluno no registro de notas.
 	for i, a := range r.alunos { // Loop para encontrar o aluno a ser atualizado.
 		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos atualizar.
-			r.alunos[i].nota = novaNota // Atualiza a nota do aluno encontrado.
+			r.alunos[i].notas = novasNotas // Atualiza as notas do aluno encontrado.
 			return true // Retorna true para indicar que a atualização foi bem-sucedida.
 		}
 	}
 	return false // Retorna false se o aluno não for encontrado.
 }
 
-func (r *registroNotas) calcularMedia() float64 { // Metodo para calcular a media das notas dos alunos no registro.
-	if len(r.alunos) == 0 { // Verifica se não há alunos no registro para evitar divisão por zero.
-		return 0.0 // Retorna 0.0 como media se não houver alunos.
+func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float64) bool {
+	if numeroNota < 1 || numeroNota > 4 {
+		return false
 	}
-	var soma float64 // Variavel para armazenar a soma das notas dos alunos.
-	for _, a := range r.alunos { // Loop para somar as notas dos alunos.
-		soma += a.nota // Adiciona a nota do aluno à soma.
+
+	for i, a := range r.alunos {
+		if a.nome == nome {
+			r.alunos[i].notas[numeroNota-1] = nota
+			return true
+		}
 	}
-	return soma / float64(len(r.alunos)) // Retorna a media das notas dos alunos.
+	return false
+}
+
+func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) {
+	for _, a := range r.alunos {
+		if a.nome == nome {
+			soma := 0.0
+			for _, nota := range a.notas {
+				soma += nota
+			}
+			return soma / 4.0, true
+		}
+	}
+	return 0.0, false
 }
 
 func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover um aluno do registro de notas.
@@ -67,8 +81,31 @@ func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover 
 func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas notas no registro de notas.
 	fmt.Println("Alunos e Notas:") // Exibe o titulo da lista de alunos e notas.
 	for _, a := range r.alunos { // Loop para exibir cada aluno e sua nota.
-		fmt.Printf("Nome: %s, Nota: %.2f\n", a.nome, a.nota) // Exibe o nome e a nota do aluno formatada com duas casas decimais.
+		soma := 0.0
+		for _, nota := range a.notas {
+			soma += nota
+		}
+		media := soma / 4.0
+		fmt.Printf("Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", a.nome, a.notas[0], a.notas[1], a.notas[2], a.notas[3], media)
 	}
+}
+
+func lerNota(reader *bufio.Reader, mensagem string) (float64, bool) {
+	fmt.Print(mensagem)
+	notaTexto, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Erro ao ler a nota.")
+		return 0, false
+	}
+
+	notaTexto = strings.TrimSpace(notaTexto)
+	nota, err := strconv.ParseFloat(notaTexto, 64)
+	if err != nil {
+		fmt.Println("Nota inválida. A nota deve ser um número.")
+		return 0, false
+	}
+
+	return nota, true
 }
 
 func nomeValido(nome string) bool {
@@ -110,11 +147,12 @@ func main() {
 		fmt.Println("\nEscolha uma opcao:") // Exibe as opcoes para o usuario.
 		fmt.Println("1. Adicionar aluno") // Opcao para adicionar um aluno.
 		fmt.Println("2. Buscar aluno") // Opcao para buscar um aluno.
-		fmt.Println("3. Atualizar nota") // Opcao para atualizar a nota de um aluno.
-		fmt.Println("4. Calcular media") // Opcao para calcular a media das notas dos alunos.
+		fmt.Println("3. Atualizar as 4 notas") // Opcao para atualizar as 4 notas de um aluno.
+		fmt.Println("4. Calcular media do aluno") // Opcao para calcular a media de um aluno.
 		fmt.Println("5. Remover aluno") // Opcao para remover um aluno do registro.
 		fmt.Println("6. Exibir alunos") // Opcao para exibir os alunos e suas notas.
-		fmt.Println("7. Sair") // Opcao para sair do programa.
+		fmt.Println("7. Incluir nota (1 a 4) em aluno existente") // Opcao para incluir nota em aluno existente.
+		fmt.Println("8. Sair") // Opcao para sair do programa.
 
 		opcao, err := reader.ReadString('\n') // Le a opcao escolhida pelo usuario.
 		if err != nil { // Verifica erro de leitura.
@@ -133,17 +171,22 @@ func main() {
 				continue
 			}
 
-			fmt.Print("Digite a nota do aluno: ") // Prompt para a nota do aluno.
-			notaTexto, _ := reader.ReadString('\n') // Le a nota do aluno como texto.
-			notaTexto = strings.TrimSpace(notaTexto) // Remove espacos e o \n do fim da nota.
-
-			nota, err := strconv.ParseFloat(notaTexto, 64) // Converte a nota de texto para float64.
-			if err != nil { // Verifica erro na conversao da nota.
-				fmt.Println("Nota inválida. A nota deve ser um número.") // Mensagem de erro.
-				continue // Volta para tentar novamente.
+			var notas [4]float64
+			valido := true
+			for i := 0; i < 4; i++ {
+				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nota %d do aluno: ", i+1))
+				if !ok {
+					valido = false
+					break
+				}
+				notas[i] = nota
 			}
 
-			registro.adicionarAluno(nome, nota) // Adiciona o aluno ao registro de notas.
+			if !valido {
+				continue
+			}
+
+			registro.adicionarAluno(nome, notas) // Adiciona o aluno ao registro de notas.
 			fmt.Println("Aluno adicionado com sucesso!") // Mensagem de sucesso.
 
 		case "2":
@@ -153,7 +196,8 @@ func main() {
 
 			alunoEncontrado := registro.buscarAluno(nome) // Busca o aluno no registro de notas.
 			if alunoEncontrado != nil { // Verifica se o aluno foi encontrado.
-				fmt.Printf("Aluno encontrado: Nome: %s, Nota: %.2f\n", alunoEncontrado.nome, alunoEncontrado.nota) // Exibe o nome e a nota do aluno encontrado.
+				media, _ := registro.calcularMediaAluno(nome)
+				fmt.Printf("Aluno encontrado: Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", alunoEncontrado.nome, alunoEncontrado.notas[0], alunoEncontrado.notas[1], alunoEncontrado.notas[2], alunoEncontrado.notas[3], media)
 			} else {
 				fmt.Println("Aluno não encontrado.") // Mensagem de erro se o aluno não for encontrado.
 			}
@@ -172,25 +216,43 @@ func main() {
 				continue
 			}
 
-			fmt.Print("Digite a nova nota do aluno: ") // Prompt para a nova nota do aluno.
-			notaTexto, _ := reader.ReadString('\n') // Le a nova nota do aluno como texto.
-			notaTexto = strings.TrimSpace(notaTexto) // Remove espacos e o \n do fim da nova nota.
-
-			novaNota, err := strconv.ParseFloat(notaTexto, 64) // Converte a nova nota de texto para float64.
-			if err != nil { // Verifica erro na conversao da nova nota.
-				fmt.Println("Nota inválida. A nota deve ser um número.") // Mensagem de erro.
-				continue // Volta para tentar novamente.
+			var notas [4]float64
+			valido := true
+			for i := 0; i < 4; i++ {
+				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nova nota %d do aluno: ", i+1))
+				if !ok {
+					valido = false
+					break
+				}
+				notas[i] = nota
 			}
 
-			if registro.atualizarNotas(nome, novaNota) { // Tenta atualizar a nota do aluno no registro de notas.
+			if !valido {
+				continue
+			}
+
+			if registro.atualizarNotas(nome, notas) { // Tenta atualizar as notas do aluno no registro de notas.
 				fmt.Println("Nota atualizada com sucesso!") // Mensagem de sucesso se a atualização for bem-sucedida.
 			} else {
 				fmt.Println("Aluno não encontrado. Não foi possível atualizar a nota.") // Mensagem de erro se o aluno não for encontrado para atualização.
 			}
 
 		case "4":
-			media := registro.calcularMedia() // Calcula a media das notas dos alunos no registro.
-			fmt.Printf("A média das notas dos alunos é: %.2f\n", media) // Exibe a media formatada com duas casas decimais.
+			fmt.Print("Digite o nome do aluno para calcular a média: ")
+			nome, _ := reader.ReadString('\n')
+			nome = strings.TrimSpace(nome)
+			if !nomeValido(nome) {
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
+				continue
+			}
+
+			media, ok := registro.calcularMediaAluno(nome)
+			if !ok {
+				fmt.Println("Aluno não encontrado.")
+				continue
+			}
+
+			fmt.Printf("A média do aluno %s é: %.2f\n", nome, media)
 
 		case "5":
 			if !confirmarAcao(reader, "Deseja remover um aluno? (s/n): ") {
@@ -212,6 +274,36 @@ func main() {
 			registro.exibirAlunos() // Exibe os alunos e suas notas no registro de notas.
 
 		case "7":
+			fmt.Print("Digite o nome do aluno para incluir nova nota: ")
+			nome, _ := reader.ReadString('\n')
+			nome = strings.TrimSpace(nome)
+			if !nomeValido(nome) {
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
+				continue
+			}
+
+			fmt.Print("Escolha qual nota deseja incluir (1, 2, 3 ou 4): ")
+			numeroTexto, _ := reader.ReadString('\n')
+			numeroTexto = strings.TrimSpace(numeroTexto)
+
+			numeroNota, err := strconv.Atoi(numeroTexto)
+			if err != nil || numeroNota < 1 || numeroNota > 4 {
+				fmt.Println("Opção inválida. Escolha um número entre 1 e 4.")
+				continue
+			}
+
+			novaNota, ok := lerNota(reader, "Digite o valor da nota: ")
+			if !ok {
+				continue
+			}
+
+			if registro.incluirNotaAluno(nome, numeroNota, novaNota) {
+				fmt.Println("Nota incluída com sucesso!")
+			} else {
+				fmt.Println("Aluno não encontrado. Não foi possível incluir a nota.")
+			}
+
+		case "8":
 			if !confirmarAcao(reader, "Deseja sair do programa? (s/n): ") {
 				fmt.Println("Saída cancelada.")
 				continue
@@ -221,7 +313,7 @@ func main() {
 			os.Exit(0) // Encerra o programa.
 
 		default: // Caso para opção inválida.
-			fmt.Println("Opção inválida. Por favor escolha uma opção entre 1 e 7.") // Mensagem de erro para opção inválida.
+			fmt.Println("Opção inválida. Por favor escolha uma opção entre 1 e 8.") // Mensagem de erro para opção inválida.
 		}
 	}
 	
