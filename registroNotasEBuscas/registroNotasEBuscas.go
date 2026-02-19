@@ -42,31 +42,31 @@ func (r *registroNotas) atualizarNotas(nome string, novasNotas [4]float64) bool 
 	return false // Retorna false se o aluno não for encontrado.
 }
 
-func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float64) bool {
-	if numeroNota < 1 || numeroNota > 4 {
-		return false
+func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float64) bool { // Metodo para incluir uma nota em um aluno existente no registro de notas, especificando qual nota (1 a 4) deve ser atualizada.
+	if numeroNota < 1 || numeroNota > 4 { // Verifica se o numero da nota é válido (entre 1 e 4). Se não for, retorna false para indicar que a inclusão da nota falhou.
+		return false // Retorna false para indicar que a inclusão da nota falhou devido a um número de nota inválido.
 	}
 
-	for i, a := range r.alunos {
-		if a.nome == nome {
-			r.alunos[i].notas[numeroNota-1] = nota
-			return true
+	for i, a := range r.alunos { // Loop para encontrar o aluno a ser atualizado.
+		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos atualizar.
+			r.alunos[i].notas[numeroNota-1] = nota //
+			return true // Retorna true para indicar que a inclusão da nota foi bem-sucedida.
 		}
 	}
-	return false
+	return false // Retorna false se o aluno não for encontrado para incluir a nota.
 }
 
-func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) {
-	for _, a := range r.alunos {
-		if a.nome == nome {
-			soma := 0.0
-			for _, nota := range a.notas {
-				soma += nota
+func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) { // Metodo para calcular a media de um aluno no registro de notas.
+	for _, a := range r.alunos { // Loop para encontrar o aluno para calcular a media.
+		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos calcular a media.
+			soma := 0.0 // Variavel para armazenar a soma das notas do aluno.
+			for _, nota := range a.notas { // Loop para somar as notas do aluno.
+				soma += nota // Adiciona a nota atual à soma total das notas do aluno.
 			}
-			return soma / 4.0, true
+			return soma / 4.0, true // Retorna a media calculada (soma das notas dividida por 4) e true para indicar que o cálculo foi bem-sucedido.
 		}
 	}
-	return 0.0, false
+	return 0.0, false // Retorna 0.0 e false se o aluno não for encontrado para calcular a media.
 }
 
 func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover um aluno do registro de notas.
@@ -90,49 +90,49 @@ func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas 
 	}
 }
 
-func lerNota(reader *bufio.Reader, mensagem string) (float64, bool) {
-	fmt.Print(mensagem)
-	notaTexto, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("Erro ao ler a nota.")
-		return 0, false
+func lerNota(reader *bufio.Reader, mensagem string) (float64, bool) { // Funcao para ler uma nota do usuario, com validacao de entrada.
+	fmt.Print(mensagem) // Exibe a mensagem de prompt para o usuario, solicitando a nota.
+	notaTexto, err := reader.ReadString('\n') // Le a entrada do usuario como uma string.
+	if err != nil { // Verifica se houve um erro ao ler a entrada do usuario.
+		fmt.Println("Erro ao ler a nota.") // Mensagem de erro se houver um problema ao ler a nota.
+		return 0, false // Retorna 0 e false para indicar que a leitura da nota falhou.
 	}
 
-	notaTexto = strings.TrimSpace(notaTexto)
-	nota, err := strconv.ParseFloat(notaTexto, 64)
-	if err != nil {
-		fmt.Println("Nota inválida. A nota deve ser um número.")
-		return 0, false
+	notaTexto = strings.TrimSpace(notaTexto) // Remove espacos e o \n do fim da string da nota, para garantir que a conversao funcione corretamente.
+	nota, err := strconv.ParseFloat(notaTexto, 64) // Tenta converter a string da nota para um valor float64. Se a conversao falhar, o erro sera tratado no bloco if abaixo.
+	if err != nil { // Verifica se houve um erro na conversao da nota.
+		fmt.Println("Nota inválida. A nota deve ser um número.") // Mensagem de erro se a nota nao for um numero valido.
+		return 0, false // Retorna 0 e false para indicar que a conversao da nota falhou.
 	}
 
-	return nota, true
+	return nota, true // Retorna a nota convertida e true para indicar que a leitura e conversao da nota foram bem-sucedidas.
 }
 
-func nomeValido(nome string) bool {
-	nome = strings.TrimSpace(nome)
-	if nome == "" {
-		return false
+func nomeValido(nome string) bool { // Funcao para validar o nome do aluno, garantindo que seja composto apenas por letras e espacos, e que nao seja vazio.
+	nome = strings.TrimSpace(nome) // Remove espacos em branco do inicio e fim do nome.
+	if nome == "" { // Verifica se o nome é vazio após remover os espaços. Se for vazio, retorna false para indicar que o nome é inválido.
+		return false //	 Retorna false para indicar que o nome é inválido.
 	}
 
-	for _, r := range nome {
-		if !unicode.IsLetter(r) && !unicode.IsSpace(r) {
-			return false
+	for _, r := range nome { // Loop para verificar cada caractere do nome, garantindo que seja uma letra ou um espaço. Se encontrar um caractere inválido, retorna false.
+		if !unicode.IsLetter(r) && !unicode.IsSpace(r) { // Verifica se o caractere não é uma letra nem um espaço.
+			return false // Retorna false para indicar que o nome é inválido se encontrar um caractere que não seja letra ou espaço.
 		}
 	}
 
-	return true
+	return true // Retorna true para indicar que o nome é válido.
 }
 
-func confirmarAcao(reader *bufio.Reader, pergunta string) bool {
-	fmt.Print(pergunta)
-	resposta, err := reader.ReadString('\n')
-	if err != nil {
-		fmt.Println("Erro ao ler confirmação. Operação cancelada.")
-		return false
+func confirmarAcao(reader *bufio.Reader, pergunta string) bool { // Funcao para confirmar uma acao do usuario, retornando true se a resposta for afirmativa.
+	fmt.Print(pergunta) // Exibe a pergunta para o usuario.
+	resposta, err := reader.ReadString('\n') // Le a resposta do usuario como uma string.
+	if err != nil { // Verifica se houve um erro ao ler a resposta.
+		fmt.Println("Erro ao ler confirmação. Operação cancelada.") // Mensagem de erro se houver um problema ao ler a resposta.
+		return false // Retorna false para indicar que a confirmacao falhou.
 	}
 
-	resposta = strings.TrimSpace(strings.ToLower(resposta))
-	return resposta == "s" || resposta == "sim"
+	resposta = strings.TrimSpace(strings.ToLower(resposta)) // Remove espacos em branco e converte a resposta para minusculas.
+	return resposta == "s" || resposta == "sim" // Retorna true se a resposta for "s" ou "sim".
 }
 
 
@@ -171,19 +171,19 @@ func main() {
 				continue
 			}
 
-			var notas [4]float64
-			valido := true
-			for i := 0; i < 4; i++ {
-				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nota %d do aluno: ", i+1))
-				if !ok {
-					valido = false
-					break
+			var notas [4]float64 // Variavel para armazenar as 4 notas do aluno.
+			valido := true // Variavel para controlar se as notas foram lidas com sucesso.
+			for i := 0; i < 4; i++ { // Loop para ler as 4 notas do aluno, usando a funcao lerNota para validar cada nota individualmente.
+				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nota %d do aluno: ", i+1)) // Prompt para a nota do aluno, indicando qual numero da nota (1 a 4) está sendo solicitada.
+				if !ok { // Verifica se a leitura da nota foi bem-sucedida. Se não for, define valido como false e quebra o loop para evitar adicionar um aluno com notas inválidas.
+					valido = false // Define valido como false para indicar que houve um problema na leitura de uma das notas.
+					break // Sai do loop de leitura das notas, pois não faz sentido continuar se uma nota for inválida.
 				}
-				notas[i] = nota
+				notas[i] = nota // Armazena a nota lida na posição correta do array de notas do aluno.
 			}
 
-			if !valido {
-				continue
+			if !valido { // Verifica se todas as notas foram lidas com sucesso. Se não foram, exibe uma mensagem de erro e continua para a próxima iteração do loop principal, evitando adicionar um aluno com notas inválidas.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente adicionar um aluno novamente com notas válidas.
 			}
 
 			registro.adicionarAluno(nome, notas) // Adiciona o aluno ao registro de notas.
@@ -216,19 +216,19 @@ func main() {
 				continue
 			}
 
-			var notas [4]float64
-			valido := true
-			for i := 0; i < 4; i++ {
-				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nova nota %d do aluno: ", i+1))
-				if !ok {
-					valido = false
-					break
+			var notas [4]float64 // Variavel para armazenar as novas 4 notas do aluno.
+			valido := true // Variavel para controlar se as novas notas foram lidas com sucesso.
+			for i := 0; i < 4; i++ { // Loop para ler as novas 4 notas do aluno, usando a funcao lerNota para validar cada nota individualmente.
+				nota, ok := lerNota(reader, fmt.Sprintf("Digite a nova nota %d do aluno: ", i+1)) // Prompt para a nova nota do aluno, indicando qual numero da nota (1 a 4) está sendo solicitada.
+				if !ok { // Verifica se a leitura da nova nota foi bem-sucedida. Se não for, define valido como false e quebra o loop para evitar atualizar um aluno com notas inválidas.
+					valido = false // Define valido como false para indicar que houve um problema na leitura de uma das novas notas.
+					break // Sai do loop de leitura das novas notas, pois não faz sentido continuar se uma nova nota for inválida.
 				}
-				notas[i] = nota
+				notas[i] = nota // Armazena a nova nota lida na posição correta do array de novas notas do aluno.
 			}
 
-			if !valido {
-				continue
+			if !valido { 	// Verifica se todas as novas notas foram lidas com sucesso. Se não foram, exibe uma mensagem de erro e continua para a próxima iteração do loop principal, evitando atualizar um aluno com notas inválidas.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente atualizar um aluno novamente com notas válidas.
 			}
 
 			if registro.atualizarNotas(nome, notas) { // Tenta atualizar as notas do aluno no registro de notas.
@@ -238,26 +238,30 @@ func main() {
 			}
 
 		case "4":
-			fmt.Print("Digite o nome do aluno para calcular a média: ")
-			nome, _ := reader.ReadString('\n')
-			nome = strings.TrimSpace(nome)
-			if !nomeValido(nome) {
-				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
-				continue
+			fmt.Print("Digite o nome do aluno para calcular a média: ") // Prompt para o nome do aluno para calcular a media.
+			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
+			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
+			if !nomeValido(nome) { // Verifica se o nome do aluno é válido.
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).") // Mensagem de erro se o nome do aluno for inválido.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente calcular a média de um aluno novamente com um nome válido.
 			}
 
-			media, ok := registro.calcularMediaAluno(nome)
-			if !ok {
-				fmt.Println("Aluno não encontrado.")
-				continue
+			media, ok := registro.calcularMediaAluno(nome) // Tenta calcular a media do aluno no registro de notas.
+			if !ok { // Verifica se o cálculo da média foi bem-sucedido. Se não for, exibe uma mensagem de erro indicando que o aluno não foi encontrado.
+				fmt.Println("Aluno não encontrado.") // Mensagem de erro se o aluno não for encontrado para calcular a média.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente calcular a média de um aluno novamente.
 			}
 
-			fmt.Printf("A média do aluno %s é: %.2f\n", nome, media)
+			fmt.Printf("A média do aluno %s é: %.2f\n", nome, media) 	// Exibe a média calculada do aluno, formatada com 2 casas decimais.
 
 		case "5":
-			if !confirmarAcao(reader, "Deseja remover um aluno? (s/n): ") {
-				fmt.Println("Remoção cancelada.")
-				continue
+			if !confirmarAcao(reader, "Deseja remover um aluno? (s/n): ") { // Confirmação para remover um aluno, perguntando ao usuário se ele tem certeza de que deseja realizar a remoção.
+				if !confirmarAcao(reader, "Tem certeza que deseja remover um aluno? Esta ação não pode ser desfeita. (s/n): ") {
+					fmt.Println("Remoção cancelada.") // Mensagem de cancelamento se o usuário não confirmar a remoção.
+					continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente remover um aluno novamente.
+				}
+				fmt.Println("Remoção cancelada.") // Mensagem de cancelamento se o usuário não confirmar a remoção.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente remover um aluno novamente.
 			}
 
 			fmt.Print("Digite o nome do aluno a ser removido: ") // Prompt para o nome do aluno a ser removido.
@@ -273,40 +277,40 @@ func main() {
 		case "6":
 			registro.exibirAlunos() // Exibe os alunos e suas notas no registro de notas.
 
-		case "7":
-			fmt.Print("Digite o nome do aluno para incluir nova nota: ")
-			nome, _ := reader.ReadString('\n')
-			nome = strings.TrimSpace(nome)
-			if !nomeValido(nome) {
-				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).")
-				continue
+		case "7": 
+			fmt.Print("Digite o nome do aluno para incluir nova nota: ") // Prompt para o nome do aluno para incluir uma nova nota.
+			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
+			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
+			if !nomeValido(nome) { // Verifica se o nome do aluno é válido.
+				fmt.Println("Aluno inválido. Digite um nome com texto (apenas letras e espaços).") // Mensagem de erro se o nome do aluno for inválido.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente incluir uma nova nota novamente com um nome válido.
 			}
 
-			fmt.Print("Escolha qual nota deseja incluir (1, 2, 3 ou 4): ")
-			numeroTexto, _ := reader.ReadString('\n')
-			numeroTexto = strings.TrimSpace(numeroTexto)
+			fmt.Print("Escolha qual nota deseja incluir (1, 2, 3 ou 4): ") // Prompt para o número da nota a ser incluída, indicando que deve ser um número entre 1 e 4.
+			numeroTexto, _ := reader.ReadString('\n') // Le o número da nota como texto.
+			numeroTexto = strings.TrimSpace(numeroTexto) // Remove espacos e o \n do fim do número da nota para garantir que a conversão para inteiro funcione corretamente.
 
-			numeroNota, err := strconv.Atoi(numeroTexto)
-			if err != nil || numeroNota < 1 || numeroNota > 4 {
-				fmt.Println("Opção inválida. Escolha um número entre 1 e 4.")
-				continue
+			numeroNota, err := strconv.Atoi(numeroTexto) // Tenta converter o número da nota de string para inteiro. Se a conversão falhar, o erro será tratado no bloco if abaixo.
+			if err != nil || numeroNota < 1 || numeroNota > 4 { // Verifica se houve um erro na conversão do número da nota ou se o número da nota não está entre 1 e 4. Se qualquer uma dessas condições for verdadeira, exibe uma mensagem de erro e continua para a próxima iteração do loop principal, permitindo que o usuário tente incluir uma nova nota novamente com um número de nota válido.
+				fmt.Println("Opção inválida. Escolha um número entre 1 e 4.") 	// Mensagem de erro se o número da nota for inválido.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente incluir uma nova nota novamente com um número de nota válido.
 			}
 
-			novaNota, ok := lerNota(reader, "Digite o valor da nota: ")
-			if !ok {
-				continue
+			novaNota, ok := lerNota(reader, "Digite o valor da nota: ") // Prompt para o valor da nova nota a ser incluída, usando a função lerNota para validar a entrada do usuário. Se a leitura da nota falhar, o erro será tratado no bloco if abaixo.
+			if !ok { // Verifica se a leitura da nova nota foi bem-sucedida. Se não for, exibe uma mensagem de erro e continua para a próxima iteração do loop principal, permitindo que o usuário tente incluir uma nova nota novamente com um valor de nota válido.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário tente incluir uma nova nota novamente com um valor de nota válido.
 			}
 
-			if registro.incluirNotaAluno(nome, numeroNota, novaNota) {
+			if registro.incluirNotaAluno(nome, numeroNota, novaNota) { 	// Tenta incluir a nova nota para o aluno no registro de notas, especificando o número da nota a ser atualizada. Se a inclusão for bem-sucedida, exibe uma mensagem de sucesso. Caso contrário, exibe uma mensagem de erro indicando que o aluno não foi encontrado para incluir a nota.
 				fmt.Println("Nota incluída com sucesso!")
 			} else {
 				fmt.Println("Aluno não encontrado. Não foi possível incluir a nota.")
 			}
 
 		case "8":
-			if !confirmarAcao(reader, "Deseja sair do programa? (s/n): ") {
-				fmt.Println("Saída cancelada.")
-				continue
+			if !confirmarAcao(reader, "Deseja sair do programa? (s/n): ") { // Prompt para confirmar se o usuário deseja sair do programa.
+				fmt.Println("Saída cancelada.") // Mensagem de cancelamento de saída.
+				continue // Continua para a próxima iteração do loop principal, permitindo que o usuário continue usando o programa.
 			}
 
 			fmt.Println("Saindo do programa...") // Mensagem de saida.
