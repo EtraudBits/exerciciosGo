@@ -17,29 +17,39 @@ type aluno struct {
 // Struct para representar o registro de notas, que contém um slice de alunos.
 type registroNotas struct {
 	alunos []aluno
+	indices map[string]int
 }
 
 func (r *registroNotas) adicionarAluno(nome string, notas [4]float64) { // Metodo para adicionar um aluno ao registro de notas.
+	if r.indices == nil {
+		r.indices = make(map[string]int)
+	}
+	indice := len(r.alunos)
 	r.alunos = append(r.alunos, aluno{nome: nome, notas: notas}) // Adiciona um novo aluno ao slice de alunos do registro.
+	r.indices[nome] = indice // Atualiza o mapa de índices para permitir busca rápida por nome.
 }
 
 func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar um aluno pelo nome no registro de notas.
-	for i, a := range r.alunos {
-		if a.nome == nome {
-			return &r.alunos[i]
-		}
+	if r.indices == nil {
+		return nil
 	}
-	return nil // Retorna nil se o aluno não for encontrado.
+	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
+	if !ok {
+		return nil // Retorna nil se o aluno não for encontrado.
+	}
+	return &r.alunos[indice] // Retorna o ponteiro para o aluno encontrado.
 }
 
 func (r *registroNotas) atualizarNotas(nome string, novasNotas [4]float64) bool { // Metodo para atualizar as notas de um aluno no registro de notas.
-	for i, a := range r.alunos { // Loop para encontrar o aluno a ser atualizado.
-		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos atualizar.
-			r.alunos[i].notas = novasNotas // Atualiza as notas do aluno encontrado.
-			return true // Retorna true para indicar que a atualização foi bem-sucedida.
-		}
+	if r.indices == nil {
+		return false
 	}
-	return false // Retorna false se o aluno não for encontrado.
+	indice, ok := r.indices[nome]
+	if !ok {
+		return false // Retorna false se o aluno não for encontrado.
+	}
+	r.alunos[indice].notas = novasNotas // Atualiza as notas do aluno encontrado.
+	return true // Retorna true para indicar que a atualização foi bem-sucedida.
 }
 
 func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float64) bool { // Metodo para incluir uma nota em um aluno existente no registro de notas, especificando qual nota (1 a 4) deve ser atualizada.
@@ -47,35 +57,51 @@ func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float
 		return false // Retorna false para indicar que a inclusão da nota falhou devido a um número de nota inválido.
 	}
 
-	for i, a := range r.alunos { // Loop para encontrar o aluno a ser atualizado.
-		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos atualizar.
-			r.alunos[i].notas[numeroNota-1] = nota //
-			return true // Retorna true para indicar que a inclusão da nota foi bem-sucedida.
-		}
+	if r.indices == nil {
+		return false
 	}
-	return false // Retorna false se o aluno não for encontrado para incluir a nota.
+	indice, ok := r.indices[nome]
+	if !ok {
+		return false // Retorna false se o aluno não for encontrado para incluir a nota.
+	}
+	r.alunos[indice].notas[numeroNota-1] = nota // Atualiza a nota específica do aluno encontrado.
+	return true // Retorna true para indicar que a inclusão da nota foi bem-sucedida.
 }
 
 func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) { // Metodo para calcular a media de um aluno no registro de notas.
-	for _, a := range r.alunos { // Loop para encontrar o aluno para calcular a media.
-		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos calcular a media.
-			soma := 0.0 // Variavel para armazenar a soma das notas do aluno.
-			for _, nota := range a.notas { // Loop para somar as notas do aluno.
-				soma += nota // Adiciona a nota atual à soma total das notas do aluno.
-			}
-			return soma / 4.0, true // Retorna a media calculada (soma das notas dividida por 4) e true para indicar que o cálculo foi bem-sucedido.
-		}
+	if r.indices == nil {
+		return 0.0, false
 	}
-	return 0.0, false // Retorna 0.0 e false se o aluno não for encontrado para calcular a media.
+	indice, ok := r.indices[nome]
+	if !ok {
+		return 0.0, false // Retorna 0.0 e false se o aluno não for encontrado para calcular a media.
+	}
+	a := r.alunos[indice]
+	soma := 0.0 // Variavel para armazenar a soma das notas do aluno.
+	for _, nota := range a.notas { // Loop para somar as notas do aluno.
+		soma += nota // Adiciona a nota atual à soma total das notas do aluno.
+	}
+	return soma / 4.0, true // Retorna a media calculada (soma das notas dividida por 4) e true para indicar que o cálculo foi bem-sucedido.
 }
 
 func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover um aluno do registro de notas.
-	for i, a := range r.alunos { // Loop para encontrar o aluno a ser removido.
-		if a.nome == nome { // Verifica se o nome do aluno atual é o que queremos remover.
-			r.alunos = append(r.alunos[:i], r.alunos[i+1:]...) // Remove o aluno do slice de alunos usando slicing para criar um novo slice sem o aluno removido.
-			return true // Retorna true para indicar que a remoção foi bem-sucedida.
-		}}
-	return false // Retorna false se o aluno não for encontrado.
+	if r.indices == nil {
+		return false
+	}
+	indice, ok := r.indices[nome]
+	if !ok {
+		return false // Retorna false se o aluno não for encontrado.
+	}
+
+	r.alunos = append(r.alunos[:indice], r.alunos[indice+1:]...) // Remove o aluno do slice de alunos usando slicing.
+	delete(r.indices, nome) // Remove o aluno do mapa de índices.
+
+	// Atualizar índices de todos os alunos após o índice removido
+	for i := indice; i < len(r.alunos); i++ {
+		r.indices[r.alunos[i].nome] = i // Reajusta os índices no mapa após a remoção.
+	}
+
+	return true // Retorna true para indicar que a remoção foi bem-sucedida.
 }
 
 func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas notas no registro de notas.
