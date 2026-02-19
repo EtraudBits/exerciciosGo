@@ -86,6 +86,18 @@ func nomeValido(nome string) bool {
 	return true
 }
 
+func confirmarAcao(reader *bufio.Reader, pergunta string) bool {
+	fmt.Print(pergunta)
+	resposta, err := reader.ReadString('\n')
+	if err != nil {
+		fmt.Println("Erro ao ler confirmação. Operação cancelada.")
+		return false
+	}
+
+	resposta = strings.TrimSpace(strings.ToLower(resposta))
+	return resposta == "s" || resposta == "sim"
+}
+
 
 
 func main() {
@@ -147,6 +159,11 @@ func main() {
 			}
 
 		case "3":
+			if !confirmarAcao(reader, "Deseja alterar a nota de um aluno? (s/n): ") {
+				fmt.Println("Alteração cancelada.")
+				continue
+			}
+
 			fmt.Print("Digite o nome do aluno para atualizar a nota: ") // Prompt para o nome do aluno a ser atualizado.
 			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
 			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
@@ -176,6 +193,11 @@ func main() {
 			fmt.Printf("A média das notas dos alunos é: %.2f\n", media) // Exibe a media formatada com duas casas decimais.
 
 		case "5":
+			if !confirmarAcao(reader, "Deseja remover um aluno? (s/n): ") {
+				fmt.Println("Remoção cancelada.")
+				continue
+			}
+
 			fmt.Print("Digite o nome do aluno a ser removido: ") // Prompt para o nome do aluno a ser removido.
 			nome, _ := reader.ReadString('\n') // Le o nome do aluno como texto.
 			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
@@ -190,6 +212,11 @@ func main() {
 			registro.exibirAlunos() // Exibe os alunos e suas notas no registro de notas.
 
 		case "7":
+			if !confirmarAcao(reader, "Deseja sair do programa? (s/n): ") {
+				fmt.Println("Saída cancelada.")
+				continue
+			}
+
 			fmt.Println("Saindo do programa...") // Mensagem de saida.
 			os.Exit(0) // Encerra o programa.
 
