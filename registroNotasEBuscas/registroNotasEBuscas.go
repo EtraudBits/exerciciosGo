@@ -12,8 +12,8 @@ import (
 
 // Struct para representar um aluno, com nome e nota.
 type aluno struct { 
-	nome string
-	notas [4]float64
+	Nome string `json:"nome"`
+	Notas [4]float64 `json:"notas"`
 }
 // Struct para representar o registro de notas, que contém um slice de alunos.
 type registroNotas struct {
@@ -26,16 +26,43 @@ func (r *registroNotas) adicionarAluno(nome string, notas [4]float64) { // Metod
 		r.indices = make(map[string]int)
 	}
 	indice := len(r.alunos)
-	r.alunos = append(r.alunos, aluno{nome: nome, notas: notas}) // Adiciona um novo aluno ao slice de alunos do registro.
+	r.alunos = append(r.alunos, aluno{Nome: nome, Notas: notas}) // Adiciona um novo aluno ao slice de alunos do registro.
 	r.indices[nome] = indice // Atualiza o mapa de índices para permitir busca rápida por nome.
 }
 
-func (r *registroNotas) salvar() error { // Metodo para salvar o registro de notas em um arquivo JSON.
+func (r *registroNotas) salvarDados() error { // Metodo para salvar o registro de notas em um arquivo JSON.
 	dados, err := json.MarshalIndent(r.alunos, "", " ") // Converte o slice de alunos para JSON formatado.
 	if err != nil { // Verifica se houve um erro na conversão para JSON.
 		return err // Retorna o erro se a conversão falhar.
 	}
 	return os.WriteFile("notas.json", dados, 0644) // Escreve os dados JSON em um arquivo chamado "notas.json" com permissões de leitura e escrita.
+}
+
+func (r *registroNotas) carregarDados() error {
+	conteudo, err := os.ReadFile("notas.json")
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	if len(conteudo) == 0 {
+		r.alunos = nil
+		r.indices = make(map[string]int)
+		return nil
+	}
+
+	if err := json.Unmarshal(conteudo, &r.alunos); err != nil {
+		return err
+	}
+
+	r.indices = make(map[string]int)
+	for i, a := range r.alunos {
+		r.indices[a.Nome] = i
+	}
+
+	return nil
 }
 
 func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar um aluno pelo nome no registro de notas.
@@ -57,7 +84,7 @@ func (r *registroNotas) atualizarNotas(nome string, novasNotas [4]float64) bool 
 	if !ok {
 		return false // Retorna false se o aluno não for encontrado.
 	}
-	r.alunos[indice].notas = novasNotas // Atualiza as notas do aluno encontrado.
+	r.alunos[indice].Notas = novasNotas // Atualiza as notas do aluno encontrado.
 	return true // Retorna true para indicar que a atualização foi bem-sucedida.
 }
 
@@ -73,7 +100,7 @@ func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float
 	if !ok {
 		return false // Retorna false se o aluno não for encontrado para incluir a nota.
 	}
-	r.alunos[indice].notas[numeroNota-1] = nota // Atualiza a nota específica do aluno encontrado.
+	r.alunos[indice].Notas[numeroNota-1] = nota // Atualiza a nota específica do aluno encontrado.
 	return true // Retorna true para indicar que a inclusão da nota foi bem-sucedida.
 }
 
@@ -87,7 +114,7 @@ func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) { // Met
 	}
 	a := r.alunos[indice]
 	soma := 0.0 // Variavel para armazenar a soma das notas do aluno.
-	for _, nota := range a.notas { // Loop para somar as notas do aluno.
+	for _, nota := range a.Notas { // Loop para somar as notas do aluno.
 		soma += nota // Adiciona a nota atual à soma total das notas do aluno.
 	}
 	return soma / 4.0, true // Retorna a media calculada (soma das notas dividida por 4) e true para indicar que o cálculo foi bem-sucedido.
@@ -107,7 +134,7 @@ func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover 
 
 	// Atualizar índices de todos os alunos após o índice removido
 	for i := indice; i < len(r.alunos); i++ {
-		r.indices[r.alunos[i].nome] = i // Reajusta os índices no mapa após a remoção.
+		r.indices[r.alunos[i].Nome] = i // Reajusta os índices no mapa após a remoção.
 	}
 
 	return true // Retorna true para indicar que a remoção foi bem-sucedida.
@@ -117,11 +144,11 @@ func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas 
 	fmt.Println("Alunos e Notas:") // Exibe o titulo da lista de alunos e notas.
 	for _, a := range r.alunos { // Loop para exibir cada aluno e sua nota.
 		soma := 0.0
-		for _, nota := range a.notas {
+		for _, nota := range a.Notas {
 			soma += nota
 		}
 		media := soma / 4.0
-		fmt.Printf("Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", a.nome, a.notas[0], a.notas[1], a.notas[2], a.notas[3], media)
+		fmt.Printf("Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", a.Nome, a.Notas[0], a.Notas[1], a.Notas[2], a.Notas[3], media)
 	}
 }
 
@@ -176,6 +203,9 @@ func main() {
 	reader := bufio.NewReader(os.Stdin) // Cria um leitor para a entrada padrao
 
 	var registro registroNotas // Cria uma variavel do tipo registroNotas para armazenar os alunos e suas notas.
+	if err := registro.carregarDados(); err != nil {
+		fmt.Println("Erro ao carregar dados:", err)
+	}
 
 	
 	for { // Loop para garantir uma opcao valida.
@@ -222,6 +252,9 @@ func main() {
 			}
 
 			registro.adicionarAluno(nome, notas) // Adiciona o aluno ao registro de notas.
+			if err := registro.salvarDados(); err != nil {
+				fmt.Println("Aluno adicionado, mas houve erro ao salvar:", err)
+			}
 			fmt.Println("Aluno adicionado com sucesso!") // Mensagem de sucesso.
 
 		case "2":
@@ -232,7 +265,7 @@ func main() {
 			alunoEncontrado := registro.buscarAluno(nome) // Busca o aluno no registro de notas.
 			if alunoEncontrado != nil { // Verifica se o aluno foi encontrado.
 				media, _ := registro.calcularMediaAluno(nome)
-				fmt.Printf("Aluno encontrado: Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", alunoEncontrado.nome, alunoEncontrado.notas[0], alunoEncontrado.notas[1], alunoEncontrado.notas[2], alunoEncontrado.notas[3], media)
+				fmt.Printf("Aluno encontrado: Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", alunoEncontrado.Nome, alunoEncontrado.Notas[0], alunoEncontrado.Notas[1], alunoEncontrado.Notas[2], alunoEncontrado.Notas[3], media)
 			} else {
 				fmt.Println("Aluno não encontrado.") // Mensagem de erro se o aluno não for encontrado.
 			}
@@ -267,6 +300,9 @@ func main() {
 			}
 
 			if registro.atualizarNotas(nome, notas) { // Tenta atualizar as notas do aluno no registro de notas.
+				if err := registro.salvarDados(); err != nil {
+					fmt.Println("Notas atualizadas, mas houve erro ao salvar:", err)
+				}
 				fmt.Println("Nota atualizada com sucesso!") // Mensagem de sucesso se a atualização for bem-sucedida.
 			} else {
 				fmt.Println("Aluno não encontrado. Não foi possível atualizar a nota.") // Mensagem de erro se o aluno não for encontrado para atualização.
@@ -304,6 +340,9 @@ func main() {
 			nome = strings.TrimSpace(nome) // Remove espacos e o \n do fim do nome.
 
 			if registro.removerAluno(nome) { // Tenta remover o aluno do registro de notas.
+				if err := registro.salvarDados(); err != nil {
+					fmt.Println("Aluno removido, mas houve erro ao salvar:", err)
+				}
 				fmt.Println("Aluno removido com sucesso!") // Mensagem de sucesso se a remoção for bem-sucedida.
 			} else {
 				fmt.Println("Aluno não encontrado. Não foi possível remover.") // Mensagem de erro se o aluno não for encontrado para remoção.
@@ -337,6 +376,9 @@ func main() {
 			}
 
 			if registro.incluirNotaAluno(nome, numeroNota, novaNota) { 	// Tenta incluir a nova nota para o aluno no registro de notas, especificando o número da nota a ser atualizada. Se a inclusão for bem-sucedida, exibe uma mensagem de sucesso. Caso contrário, exibe uma mensagem de erro indicando que o aluno não foi encontrado para incluir a nota.
+				if err := registro.salvarDados(); err != nil {
+					fmt.Println("Nota incluída, mas houve erro ao salvar:", err)
+				}
 				fmt.Println("Nota incluída com sucesso!")
 			} else {
 				fmt.Println("Aluno não encontrado. Não foi possível incluir a nota.")
