@@ -38,36 +38,36 @@ func (r *registroNotas) salvarDados() error { // Metodo para salvar o registro d
 	return os.WriteFile("notas.json", dados, 0644) // Escreve os dados JSON em um arquivo chamado "notas.json" com permissões de leitura e escrita.
 }
 
-func (r *registroNotas) carregarDados() error {
-	conteudo, err := os.ReadFile("notas.json")
-	if err != nil {
-		if os.IsNotExist(err) {
-			return nil
+func (r *registroNotas) carregarDados() error { // Metodo para carregar o registro de notas de um arquivo JSON.
+	conteudo, err := os.ReadFile("notas.json") // Tenta ler o conteúdo do arquivo "notas.json". Se o arquivo não existir, o erro será tratado para permitir que o programa continue com um registro vazio.
+	if err != nil { // Verifica se houve um erro ao ler o arquivo.
+		if os.IsNotExist(err) { // Verifica se o erro é do tipo "arquivo não encontrado". Se for, isso significa que o arquivo ainda não existe, e o programa pode continuar com um registro vazio sem tratar isso como um erro crítico.
+			return nil // Retorna nil para indicar que não houve um erro crítico, permitindo que o programa continue com um registro vazio.
 		}
-		return err
+		return err // Retorna o erro se houve um problema ao ler o arquivo que não seja "arquivo não encontrado".
 	}
 
-	if len(conteudo) == 0 {
-		r.alunos = nil
-		r.indices = make(map[string]int)
-		return nil
+	if len(conteudo) == 0 { // Verifica se o conteúdo do arquivo é vazio. Se for, isso significa que o arquivo existe mas não contém dados, e o programa pode continuar com um registro vazio.
+		r.alunos = nil // Define o slice de alunos como nil para indicar que não há alunos no registro, e inicializa o mapa de índices vazio.
+		r.indices = make(map[string]int) // Inicializa o mapa de índices vazio, já que não há alunos para indexar.
+		return nil // Retorna nil para indicar que o carregamento foi bem-sucedido, mesmo que o arquivo esteja vazio.
 	}
 
-	if err := json.Unmarshal(conteudo, &r.alunos); err != nil {
-		return err
+	if err := json.Unmarshal(conteudo, &r.alunos); err != nil { // Tenta converter o conteúdo JSON do arquivo para o slice de alunos do registro. Se a conversão falhar, o erro será retornado.
+		return err // Retorna o erro se a conversão do conteúdo JSON para o slice de alunos falhar.
 	}
 
-	r.indices = make(map[string]int)
-	for i, a := range r.alunos {
-		r.indices[a.Nome] = i
+	r.indices = make(map[string]int) // Inicializa o mapa de índices para permitir busca rápida por nome, preenchendo-o com os índices dos alunos carregados.
+	for i, a := range r.alunos { // Loop para preencher o mapa de índices com os nomes dos alunos e seus respectivos índices no slice de alunos, permitindo busca rápida por nome.
+		r.indices[a.Nome] = i // Adiciona o nome do aluno e seu índice ao mapa de índices para permitir busca rápida por nome.
 	}
 
-	return nil
+	return nil // Retorna nil para indicar que o carregamento dos dados foi bem-sucedido.
 }
 
 func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar um aluno pelo nome no registro de notas.
-	if r.indices == nil {
-		return nil
+	if r.indices == nil { // Verifica se o mapa de índices está inicializado. Se não estiver, retorna nil.
+		return nil // Retorna nil para indicar que o aluno não foi encontrado, já que o mapa de índices não está inicializado.
 	}
 	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
 	if !ok {
@@ -77,10 +77,10 @@ func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar 
 }
 
 func (r *registroNotas) atualizarNotas(nome string, novasNotas [4]float64) bool { // Metodo para atualizar as notas de um aluno no registro de notas.
-	if r.indices == nil {
-		return false
+	if r.indices == nil { // Verifica se o mapa de índices está inicializado. Se não estiver, retorna false.
+		return false // Retorna false para indicar que a atualização falhou, já que o mapa de índices não está inicializado.
 	}
-	indice, ok := r.indices[nome]
+	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
 	if !ok {
 		return false // Retorna false se o aluno não for encontrado.
 	}
@@ -93,10 +93,10 @@ func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float
 		return false // Retorna false para indicar que a inclusão da nota falhou devido a um número de nota inválido.
 	}
 
-	if r.indices == nil {
-		return false
+	if r.indices == nil { // Verifica se o mapa de índices está inicializado. Se não estiver, retorna false.
+		return false // Retorna false para indicar que a inclusão da nota falhou, já que o mapa de índices não está inicializado.
 	}
-	indice, ok := r.indices[nome]
+	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
 	if !ok {
 		return false // Retorna false se o aluno não for encontrado para incluir a nota.
 	}
@@ -105,10 +105,10 @@ func (r *registroNotas) incluirNotaAluno(nome string, numeroNota int, nota float
 }
 
 func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) { // Metodo para calcular a media de um aluno no registro de notas.
-	if r.indices == nil {
-		return 0.0, false
+	if r.indices == nil { // Verifica se o mapa de índices está inicializado. Se não estiver, retorna 0.0 e false.
+		return 0.0, false // Retorna 0.0 e false para indicar que o cálculo da média falhou, já que o mapa de índices não está inicializado.
 	}
-	indice, ok := r.indices[nome]
+	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
 	if !ok {
 		return 0.0, false // Retorna 0.0 e false se o aluno não for encontrado para calcular a media.
 	}
@@ -121,10 +121,10 @@ func (r *registroNotas) calcularMediaAluno(nome string) (float64, bool) { // Met
 }
 
 func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover um aluno do registro de notas.
-	if r.indices == nil {
-		return false
+	if r.indices == nil { // Verifica se o mapa de índices está inicializado. Se não estiver, retorna false.
+		return false // Retorna false para indicar que a remoção falhou, já que o mapa de índices não está inicializado.
 	}
-	indice, ok := r.indices[nome]
+	indice, ok := r.indices[nome] // Busca o índice do aluno no mapa de índices em tempo constante O(1).
 	if !ok {
 		return false // Retorna false se o aluno não for encontrado.
 	}
@@ -143,12 +143,12 @@ func (r *registroNotas) removerAluno(nome string) bool { // Metodo para remover 
 func (r *registroNotas) exibirAlunos() { // Metodo para exibir os alunos e suas notas no registro de notas.
 	fmt.Println("Alunos e Notas:") // Exibe o titulo da lista de alunos e notas.
 	for _, a := range r.alunos { // Loop para exibir cada aluno e sua nota.
-		soma := 0.0
-		for _, nota := range a.Notas {
-			soma += nota
+		soma := 0.0 // Variavel para armazenar a soma das notas do aluno, usada para calcular a media.
+		for _, nota := range a.Notas { // Loop para somar as notas do aluno, necessário para calcular a media.
+			soma += nota // Adiciona a nota atual à soma total das notas do aluno.
 		}
-		media := soma / 4.0
-		fmt.Printf("Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", a.Nome, a.Notas[0], a.Notas[1], a.Notas[2], a.Notas[3], media)
+		media := soma / 4.0 // Calcula a media do aluno dividindo a soma das notas por 4.
+		fmt.Printf("Nome: %s, Notas: [%.2f, %.2f, %.2f, %.2f], Média: %.2f\n", a.Nome, a.Notas[0], a.Notas[1], a.Notas[2], a.Notas[3], media) // Exibe o nome do aluno, suas notas formatadas com 2 casas decimais e a média calculada, também formatada com 2 casas decimais.
 	}
 }
 
