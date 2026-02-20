@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -27,6 +28,14 @@ func (r *registroNotas) adicionarAluno(nome string, notas [4]float64) { // Metod
 	indice := len(r.alunos)
 	r.alunos = append(r.alunos, aluno{nome: nome, notas: notas}) // Adiciona um novo aluno ao slice de alunos do registro.
 	r.indices[nome] = indice // Atualiza o mapa de índices para permitir busca rápida por nome.
+}
+
+func (r *registroNotas) salvar() error { // Metodo para salvar o registro de notas em um arquivo JSON.
+	dados, err := json.MarshalIndent(r.alunos, "", " ") // Converte o slice de alunos para JSON formatado.
+	if err != nil { // Verifica se houve um erro na conversão para JSON.
+		return err // Retorna o erro se a conversão falhar.
+	}
+	return os.WriteFile("notas.json", dados, 0644) // Escreve os dados JSON em um arquivo chamado "notas.json" com permissões de leitura e escrita.
 }
 
 func (r *registroNotas) buscarAluno(nome string) *aluno { // Metodo para buscar um aluno pelo nome no registro de notas.
