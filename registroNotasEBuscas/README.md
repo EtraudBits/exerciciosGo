@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Este programa de terminal permite cadastrar alunos, registrar notas, buscar informações e calcular média individual.
+Este programa de terminal permite cadastrar alunos, registrar notas, buscar informações, calcular média individual e persistir os dados em arquivo JSON.
 
 ## O que foi implementado
 
@@ -24,10 +24,39 @@ Este programa de terminal permite cadastrar alunos, registrar notas, buscar info
 - Atualização completa das 4 notas de um aluno.
 - Atualização de nota específica (nota 1, 2, 3 ou 4).
 - Remoção de aluno.
+- Persistência dos dados em `notas.json`.
+- Carregamento automático dos dados ao iniciar o programa.
 - Confirmação antes de ações sensíveis:
   - alterar notas
   - remover aluno
   - sair do sistema
+
+### Persistência de dados
+
+- `carregarDados()` é chamada no início do `main`.
+- A função tenta ler `notas.json` com `os.ReadFile`.
+- Se o arquivo existir e o conteúdo for válido, os alunos são carregados com `json.Unmarshal`.
+- Após carregar, o mapa de índices (`map[string]int`) é reconstruído para manter buscas em O(1).
+- `salvarDados()` é chamada sempre que a lista muda:
+  - ao adicionar aluno
+  - ao remover aluno
+  - ao atualizar as 4 notas
+  - ao incluir nota específica (1 a 4)
+
+### Exemplo do arquivo `notas.json`
+
+```json
+[
+  {
+    "nome": "Maria",
+    "notas": [8.5, 7.0, 9.0, 8.0]
+  },
+  {
+    "nome": "Joao",
+    "notas": [6.5, 7.5, 8.0, 7.0]
+  }
+]
+```
 
 ## Validações aplicadas
 
@@ -51,8 +80,9 @@ Este programa de terminal permite cadastrar alunos, registrar notas, buscar info
 ### Pacotes da biblioteca padrão
 
 - `bufio` para leitura de entrada no terminal
+- `encoding/json` para serialização e desserialização dos dados
 - `fmt` para exibição de mensagens
-- `os` para encerrar o programa
+- `os` para leitura/escrita de arquivo e encerramento do programa
 - `strconv` para converter texto em número
 - `strings` para tratar texto de entrada
 - `unicode` para validar caracteres do nome
@@ -65,6 +95,7 @@ Este programa de terminal permite cadastrar alunos, registrar notas, buscar info
 - **`map[string]int`** para otimizar busca por nome (O(1) em vez de O(n))
 - `for` e `switch` para fluxo do menu
 - funções auxiliares para validação e confirmação
+- persistência em JSON (`MarshalIndent`, `Unmarshal`, `ReadFile`, `WriteFile`)
 
 ### Otimização com Map
 
@@ -90,4 +121,4 @@ go build registroNotasEBuscas.go
 
 ## Resultado esperado
 
-Ao informar as notas de um aluno, o programa calcula corretamente a média individual com base nas 4 notas cadastradas/atualizadas.
+Ao informar as notas de um aluno, o programa calcula corretamente a média individual com base nas 4 notas cadastradas/atualizadas e mantém os dados salvos em `notas.json` entre execuções.
