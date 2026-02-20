@@ -203,8 +203,13 @@ func main() {
 	reader := bufio.NewReader(os.Stdin) // Cria um leitor para a entrada padrao
 
 	var registro registroNotas // Cria uma variavel do tipo registroNotas para armazenar os alunos e suas notas.
+	_, errArquivo := os.Stat("notas.json")
+	arquivoExiste := errArquivo == nil
+
 	if err := registro.carregarDados(); err != nil {
 		fmt.Println("Erro ao carregar dados:", err)
+	} else if arquivoExiste {
+		fmt.Println("Dados carregados com sucesso de notas.json!")
 	}
 
 	
