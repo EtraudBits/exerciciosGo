@@ -1,9 +1,9 @@
-// 5 extratergias de tratamento de erros.
+// 5 estratégias de tratamento de erros.
 // 1 Programar
 // 2 Repetir
 // 3 Encerrar
 // 4 logar e continuar
-// ignorar (Raro)
+// 5 Ignorar (Raro)
 
 package main
 
