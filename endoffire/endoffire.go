@@ -4,7 +4,7 @@ package main
 
 import (
 	"fmt"
-	"io"
+	"io" // pacote io é usado para lidar com operações de entrada/saída, como leitura e escrita de dados. Ele fornece a interface io.Reader, que é implementada por tipos que podem ser lidos, como strings.NewReader. Neste código, io.EOF é usado para detectar quando a leitura atingiu o final do arquivo (ou seja, quando não há mais dados para ler).
 	"strings"
 )
 
@@ -13,7 +13,7 @@ func main() {
 	leitor := strings.NewReader("<html>Link1, Link2</html>")
 
 	//criamos um buffer (pequeno espaço na RAM) para ler 1 byte por vez
-	p := make([]byte, 1)
+	p := make([]byte, 1) 
 
 	for {
 		_, err := leitor.Read(p) // tenta ler o próximo byte
